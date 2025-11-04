@@ -2,15 +2,16 @@ package com.reliaquest.api.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import com.reliaquest.api.dao.EmployeeRepository;
+import com.reliaquest.api.dto.EmployeeResponseDto;
 import com.reliaquest.api.exception.ResourceNotFoundException;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.EmployeeDto;
+import com.reliaquest.api.dto.RequestEmployeeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.*;
@@ -93,14 +94,45 @@ public class EmployeeServiceImplTest {
     }
 
     @Test
-    void testDeleteEmployeeByName_NonExistingId_ReturnsFalse() {
-        String id = "999";
-        when(employeeRepository.existsById(id)).thenReturn(false);
+    void searchEmployeesByName_WhenEmployeesExist_ReturnsList() {
+        // Arrange
+        String nameFragment = "abc";
+        List<Employee> mockList = Arrays.asList(new Employee("abc xyz", 5000, 50, "eng", "abc@gmail.com"));
+        when(employeeRepository.findByNameContainingIgnoreCase(nameFragment)).thenReturn(mockList);
 
-        boolean result = employeeService.deleteEmployeeByName(id);
-        assertFalse(result);
-        verify(employeeRepository).existsById(id);
-        verify(employeeRepository, never()).deleteByName(anyString());
+        // Act
+        List<Employee> result = employeeService.searchEmployeesByName(nameFragment);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals("abc xyz", result.get(0).getName());
+        verify(employeeRepository).findByNameContainingIgnoreCase(nameFragment);
+    }
+
+    @Test
+    void searchEmployeesByName_WhenListNull_ThrowsResourceNotFoundException() {
+        // Arrange
+        String nameFragment = "Missing";
+        when(employeeRepository.findByNameContainingIgnoreCase(nameFragment)).thenReturn(null);
+
+        // Act & Assert
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
+                employeeService.searchEmployeesByName(nameFragment));
+        assertTrue(ex.getMessage().contains("No employee available with name: " + nameFragment));
+        verify(employeeRepository).findByNameContainingIgnoreCase(nameFragment);
+    }
+
+    @Test
+    void searchEmployeesByName_WhenListEmpty_ThrowsResourceNotFoundException() {
+        // Arrange
+        String nameFragment = "Missing";
+        when(employeeRepository.findByNameContainingIgnoreCase(nameFragment)).thenReturn(Collections.emptyList());
+
+        // Act & Assert
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () ->
+                employeeService.searchEmployeesByName(nameFragment));
+        assertTrue(ex.getMessage().contains("No employee available with name: " + nameFragment));
+        verify(employeeRepository).findByNameContainingIgnoreCase(nameFragment);
     }
 
     @Test
@@ -142,7 +174,7 @@ public class EmployeeServiceImplTest {
 
     @Test
     void testCreateEmployee_SavesAndReturnsEmployee() {
-        EmployeeDto dto = new EmployeeDto();
+        RequestEmployeeDto dto = new RequestEmployeeDto();
         dto.setName("New Emp");
         dto.setSalary(55000);
         dto.setAge(28);

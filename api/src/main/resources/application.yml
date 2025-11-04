@@ -15,3 +15,12 @@ spring:
     console:
       enabled: true
       path: /h2-console
+  cache:
+    cache-names:
+      - employees
+      - employeesAll
+      - employeesSearch
+      - topTenEmployees
+      - maxSalary                    # Define your cache names here
+    caffeine:
+      spec: "maximumSize=500,expireAfterAccess=600s"  # 600s = 10 minutes

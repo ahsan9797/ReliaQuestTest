@@ -1,7 +1,8 @@
 package com.reliaquest.api.service;
 
+import com.reliaquest.api.dto.EmployeeResponseDto;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.EmployeeDto;
+import com.reliaquest.api.dto.RequestEmployeeDto;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface EmployeeService {
 
     List<Employee> getTopTenEarningEmployeeNames();
 
-    Employee createEmployee(EmployeeDto employee);
+    Employee createEmployee(RequestEmployeeDto employee);
 }

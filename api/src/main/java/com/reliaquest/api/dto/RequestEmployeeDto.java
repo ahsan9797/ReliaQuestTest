@@ -1,4 +1,4 @@
-package com.reliaquest.api.model;
+package com.reliaquest.api.dto;
 
 
 import jakarta.validation.constraints.Max;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class EmployeeDto {
+public class RequestEmployeeDto {
 
     @NotNull
     @NotBlank
